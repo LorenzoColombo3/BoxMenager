@@ -1,0 +1,195 @@
+/* Reset e base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    display: flex;
+    justify-content: center;  /* Centra orizzontalmente */
+    align-items: center;      /* Centra verticalmente */
+    min-height: 100vh;        /* Assicura che prenda tutta l'altezza */
+    padding: 20px;            /* Per evitare che tocchi i bordi */
+}
+
+/* Top bar */
+.top-bar {
+    background-color: #007BFF;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    font-size: 18px;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Nome azienda */
+.company-name {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Bottone homepage */
+.homepage-btn {
+    background-color: white;
+    color: #007BFF;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.homepage-btn:hover {
+    background-color: #0056b3;
+    color: white;
+}
+
+/* Main Container centrato */
+.main-container {
+    max-width: 800px;
+    width: 100%;
+    background-color: #e3f2fd;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+    justify-content: space-between;
+}
+
+/* Informazioni cliente */
+.customer-info {
+    margin-bottom: 20px;
+    margin-top: 10px; /* Aggiunto margine superiore */
+}
+
+
+/* Card contenente i box occupati */
+.boxes-container {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+/* Singolo box */
+.box-card {
+    background-color: #ffffff;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Contenitore per i pulsanti in basso */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+}
+
+/* Pulsanti */
+button {
+    cursor: pointer;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.delete-btn {
+    background-color: red;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #d9534f;
+}
+
+.add-box-btn {
+    background-color: #007BFF;
+    color: #fff;
+}
+
+.add-box-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Form Overlay */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 80;
+}
+
+/* Form per aggiungere box */
+#addBoxForm {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    width: 80%;
+    max-width: 800px;
+    box-sizing: border-box;
+}
+
+/* Form Fields */
+#addBoxForm input,
+#addBoxForm select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* Form Buttons */
+#addBoxForm button {
+    width: 48%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#addBoxForm button[type="submit"] {
+    background-color: #007BFF;
+    color: white;
+}
+
+#addBoxForm button[type="button"] {
+    background-color: #ccc;
+}
+

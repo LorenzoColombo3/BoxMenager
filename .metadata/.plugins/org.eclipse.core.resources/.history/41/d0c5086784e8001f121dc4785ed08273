@@ -1,0 +1,104 @@
+package com.example.box_manager.viewModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import com.example.box_manager.model.Company;
+import com.example.box_manager.model.Customer;
+import com.example.box_manager.repository.CompanyRepository;
+import com.example.box_manager.repository.CustomerRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Component
+public class CustomersViewModel {
+
+    @Autowired
+    private CustomerRepository cr;
+    @Autowired
+    private CompanyRepository compRep;
+
+    public String getCustomersPage(HttpServletRequest httpRequest, Model model) {
+        Company user = (Company) httpRequest.getSession().getAttribute("user"); 
+        System.out.println("userid"+user.getUid());
+        if (user == null || user.getUid() == null) {
+            return "redirect:/login"; 
+        }
+
+        model.addAttribute("aziendaNome", user.getNome());
+
+        List<Customer> customersList = getCustomerList(user);
+
+        model.addAttribute("clienti", customersList);
+
+        return "customerpage";
+    }
+
+    public String addCustomer(String nome, String cognome, String citta, String email, HttpServletRequest httpRequest) {
+        // Stampa per verificare lo stato della sessione prima di fare modifiche
+        Company user = (Company) httpRequest.getSession().getAttribute("user");
+        System.out.println("Utente nella sessione prima dell'aggiornamento: " + user);
+
+        if (user == null || user.getUid() == null) {
+            return "redirect:/login"; 
+        }
+
+        // Creazione del nuovo cliente
+        Customer newCustomer = new Customer();
+        newCustomer.setNome(nome);
+        newCustomer.setCognome(cognome);
+        newCustomer.setCitta(citta);
+        newCustomer.setEmail(email);
+
+        // Aggiunta del nuovo cliente nel database
+        cr.addNewCustomer(user.getUid(), newCustomer);
+
+        try {
+            Company updatedUser = compRep.getCompanyDataByUserUid(user.getUid()).get();
+            
+            System.out.println("Utente aggiornato: " + updatedUser);
+
+            httpRequest.getSession().setAttribute("user", updatedUser);
+            
+            System.out.println(updatedUser.getCliente().toString());
+            
+            // Verifica che l'utente sia stato correttamente aggiornato nella sessione
+            System.out.println("Utente nella sessione dopo l'aggiornamento: " + httpRequest.getSession().getAttribute("user"));
+            
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        // Verifica se la sessione contiene il dato dell'utente, e se sì, redirige correttamente
+        Company updatedSessionUser = (Company) httpRequest.getSession().getAttribute("user");
+        if (updatedSessionUser == null) {
+            System.out.println("Problema con la sessione: utente non trovato dopo l'aggiornamento.");
+            return "redirect:/login"; // Se non ci sono dati validi nella sessione, invia al login
+        }
+
+        return "redirect:/customers"; // Se tutto va bene, vai alla lista clienti
+    }
+
+
+
+    private List<Customer> getCustomerList(Company user) {
+        List<Customer> customersList = new ArrayList<>();
+        for (String id : user.getCliente()) {
+            try {
+                Customer customer = cr.getCustomersDataByUserUid(user.getUid(), id).get();
+                customersList.add(customer);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        return customersList;
+    }
+}

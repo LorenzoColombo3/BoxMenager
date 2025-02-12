@@ -1,0 +1,58 @@
+package com.example.box_manager.viewModel;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
+
+import com.example.box_manager.model.Company;
+import com.example.box_manager.model.Unit;
+import com.example.box_manager.repository.CompanyRepository;
+import com.example.box_manager.repository.UnitRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+@Component
+public class BoxPageViewModel {
+
+    private final UnitRepository unitRepository;
+    private CompanyRepository compRep;
+
+    @Autowired
+    public BoxPageViewModel(UnitRepository unitRepository, CompanyRepository compRep) {
+    	this.compRep=compRep;
+        this.unitRepository = unitRepository;
+    }
+    
+    String getBoxPage(HttpServletRequest httpRequest, Model model) throws InterruptedException, ExecutionException {
+    	Company user = (Company) httpRequest.getSession().getAttribute("user");
+    	if (user == null || user.getUid() == null) {
+            return "redirect:/login"; 
+        }else {
+        	Company updatedUser = compRep.getCompanyDataByUserUid(user.getUid()).get();
+            
+            System.out.println("Utente aggiornato: " + updatedUser);
+
+            httpRequest.getSession().setAttribute("user", updatedUser);
+            
+            System.out.println(updatedUser.getCliente().toString());
+            
+            // Verifica che l'utente sia stato correttamente aggiornato nella sessione
+            System.out.println("Utente nella sessione dopo l'aggiornamento: " + httpRequest.getSession().getAttribute("user"));
+        }
+    	model.addAttribute("boxes", unitRepository.getDepositoUnits(user.getUid()).get());
+    	model.addAllAttributes("aziendaNome", user.getNome());
+    	return "boxpage";
+    }
+
+    public CompletableFuture<List<Unit>> getAllBoxes(String uid) {
+        return unitRepository.getDepositoUnits(uid);
+    }
+
+	public void addNewBox(String uid, Unit newUnit) {
+		unitRepository.addNewBox(uid, newUnit);
+	}
+}

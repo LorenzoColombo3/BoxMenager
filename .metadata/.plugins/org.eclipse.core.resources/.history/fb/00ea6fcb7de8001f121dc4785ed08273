@@ -1,0 +1,274 @@
+package com.example.box_manager.repository;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.example.box_manager.model.Company;
+import com.example.box_manager.model.Customer;
+import com.example.box_manager.model.CustomerUnit;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Repository
+public class CustomerRepository {
+	private final DatabaseReference databaseReference;
+
+    public CustomerRepository() {
+        this.databaseReference = FirebaseDatabase.getInstance().getReference("Azienda");
+    }
+    public CompletableFuture<Customer> getCustomersDataByUserUid(String uid, String cid) {
+        CompletableFuture<Customer> future = new CompletableFuture<>();
+
+        databaseReference.child(uid).child("Cliente").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Customer foundCustomer =  new Customer();;
+
+                    // Itera solo sugli elementi non nulli
+                    for (DataSnapshot customerSnapshot : snapshot.getChildren()) {
+                        if (customerSnapshot != null && customerSnapshot.getKey().equals(cid)) {
+                        	foundCustomer.setId(customerSnapshot.getKey());
+                            foundCustomer.setCitta(getCustomerCitta(customerSnapshot));
+                            foundCustomer.setEmail(getCustomerEmail(customerSnapshot));
+                            foundCustomer.setNome(getCustomerNome(customerSnapshot));
+                            foundCustomer.setCognome(getCustomerCognome(customerSnapshot));
+                            System.out.println(foundCustomer.getEmail());
+                            // Recupera le unità
+                            getCustomerUnits(uid, cid).thenAccept(units -> {
+                                foundCustomer.setUnita(units);
+                                future.complete(foundCustomer);
+                            }).exceptionally(ex -> {
+                                future.completeExceptionally(ex);
+                                return null;
+                            });
+
+                            return; // Esci dal ciclo una volta trovato il cliente
+                        }
+                    }
+
+                    if (foundCustomer == null) {
+                        future.completeExceptionally(new RuntimeException("Cliente con ID " + cid + " non trovato."));
+                    }
+                } else {
+                    future.completeExceptionally(new RuntimeException("Nessun cliente trovato per l'UID: " + uid));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                future.completeExceptionally(error.toException());
+            }
+        });
+
+        return future;
+    }
+
+    private CompletableFuture<List<CustomerUnit>> getCustomerUnits(String uid, String cid) {
+        CompletableFuture<List<CustomerUnit>> future = new CompletableFuture<>();
+
+        databaseReference.child(uid).child("Cliente").child(cid).child("Unità").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                List<CustomerUnit> units = new ArrayList<>();
+                if (snapshot.exists()) {
+
+                	for (DataSnapshot unitSnapshot : snapshot.getChildren()) {
+                	    if (unitSnapshot != null) {
+                	        System.out.println("Esaminando unitSnapshot: " + unitSnapshot.getKey());
+                	        System.out.println("Contenuto unitSnapshot: " + unitSnapshot.getValue());
+
+                	        try {
+                	            CustomerUnit unit = new CustomerUnit();
+                	            System.out.println("1 - Inizio parsing unità");
+
+                	            // Verifica che i campi esistano e logga i valori
+                	            if (unitSnapshot.hasChild("numero")) {
+                	                System.out.println("Campo numero presente");
+                	                String numero = unitSnapshot.child("numero").getValue().toString();
+                	                unit.setNumero(numero);
+                	                System.out.println("numero: " + numero);
+                	            } else {
+                	                System.out.println("Campo numero mancante");
+                	            }
+
+                	            if (unitSnapshot.hasChild("codice")) {
+                	                Integer codice = unitSnapshot.child("codice").getValue(Integer.class);
+                	                unit.setCodice(codice);
+                	                System.out.println("codice: " + codice);
+                	            } else {
+                	                System.out.println("Campo codice mancante");
+                	            }
+
+                	            if (unitSnapshot.hasChild("dataInizio")) {
+                	                Integer dataInizio = unitSnapshot.child("dataInizio").getValue(Integer.class);
+                	                unit.setDataInizio(dataInizio);
+                	                System.out.println("dataInizio: " + dataInizio);
+                	            } else {
+                	                System.out.println("Campo dataInizio mancante");
+                	            }
+
+                	            if (unitSnapshot.hasChild("dataFine")) {
+                	                Integer dataFine = unitSnapshot.child("dataFine").getValue(Integer.class);
+                	                unit.setDataFine(dataFine);
+                	                System.out.println("dataFine: " + dataFine);
+                	            } else {
+                	                System.out.println("Campo dataFine mancante");
+                	            }
+
+                	            units.add(unit);
+                	        } catch (Exception e) {
+                	            System.err.println("Errore durante il parsing di unitSnapshot: " + e.getMessage());
+                	            e.printStackTrace();
+                	        }
+                	    } else {
+                	        System.out.println("unitSnapshot nullo, saltando");
+                	    }
+                	}
+
+                    future.complete(units); // Completa il futuro con le unità
+                } else {
+                    future.complete(null);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                future.completeExceptionally(error.toException());
+            }
+        });
+
+        return future;
+    }
+    
+    public CompletableFuture<Void> addNewCustomer(String uid, Customer customer,HttpServletRequest httpRequest) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        // Riferimento al contatore per l'ID del cliente
+        DatabaseReference counterRef = databaseReference.child(uid).child("ClienteCounter");
+
+        // Usa un ValueEventListener per ottenere il contatore
+        counterRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                // Recupera il contatore e incrementalo, se il contatore non esiste inizializzalo a 1
+                long newCustomerId = snapshot.exists() ? snapshot.getValue(Long.class) + 1 : 1;
+                // Aggiorna il contatore nel database
+                counterRef.setValue(newCustomerId, (error, ref) -> {
+                    if (error != null) {
+                        future.completeExceptionally(error.toException()); // Se c'è un errore nell'aggiornare il contatore
+                    } else {
+                        // Crea il nuovo cliente con l'ID incrementato
+                        DatabaseReference newCustomerRef = databaseReference.child(uid).child("Cliente").child(String.valueOf(newCustomerId));
+
+                        // Imposta i dati del cliente nel database
+                        newCustomerRef.setValue(customer, (error2, ref2) -> {
+                            if (error2 != null) {
+                                future.completeExceptionally(error2.toException()); // Se c'è un errore nell'inserire il cliente
+                            } else {
+                                future.complete(null); // Cliente aggiunto con successo
+                            }
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                future.completeExceptionally(error.toException()); // Se c'è un errore durante la lettura del contatore
+            }
+        });
+
+        return future;
+    }
+
+    public CompletableFuture<Void> removeCustomer(String uid, String cid) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        // Crea un riferimento al cliente da rimuovere
+        DatabaseReference customerRef = databaseReference.child(uid).child("Cliente").child(cid);
+        System.out.println("riferimento creato");
+        // Rimuovi il cliente
+        customerRef.removeValue((error, ref) -> {
+        	System.out.println("sta rimuovendo");
+            if (error != null) {
+                future.completeExceptionally(error.toException()); // Se c'è un errore durante la rimozione
+            } else {
+                future.complete(null); // Cliente rimosso con successo
+                System.out.println("rimosso");
+            }
+        });
+
+        return future;
+    }
+
+    public CompletableFuture<Void> addCustomerUnit(String uid, String cid, CustomerUnit unit) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        // Crea un riferimento alla lista delle unità del cliente specificato
+        DatabaseReference unitsRef = databaseReference.child(uid).child("Cliente").child(cid).child("Unità");
+
+        // Aggiungi la nuova unità al nodo delle unità del cliente
+        DatabaseReference newUnitRef = unitsRef.child(unit.getNumero()); // Utilizziamo push() per creare un nuovo ID univoco per l'unità
+
+        // Imposta i dati della nuova unità
+        newUnitRef.setValue(unit, (error, ref) -> {
+            if (error != null) {
+                future.completeExceptionally(error.toException()); // Se c'è un errore durante l'aggiunta
+            } else {
+                future.complete(null); // Se l'aggiunta è riuscita, completiamo il futuro
+            }
+        });
+
+        return future;
+    }
+    
+    public CompletableFuture<Void> removeCustomerUnit(String uid, String cid, String unitNumber) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        // Crea un riferimento alla lista delle unità del cliente specificato
+        DatabaseReference unitsRef = databaseReference.child(uid).child("Cliente").child(cid).child("Unità");
+
+        // Crea un riferimento specifico per l'unità da rimuovere, usando il numero dell'unità come chiave
+        DatabaseReference unitRef = unitsRef.child(unitNumber);
+
+        // Rimuove l'unità dal database
+        unitRef.removeValue((error, ref) -> {
+            if (error != null) {
+                future.completeExceptionally(error.toException()); // Se c'è un errore durante la rimozione
+            } else {
+                future.complete(null); // Se la rimozione è riuscita, completiamo il futuro
+            }
+        });
+
+        return future;
+    }
+
+    // Metodo per recuperare il nome dell'azienda
+    public String getCustomerNome(DataSnapshot customerData) {
+        return customerData.child("nome").getValue(String.class);
+    }
+    public String getCustomerCognome(DataSnapshot customerData) {
+        return customerData.child("cognome").getValue(String.class);
+    }
+    public String getCustomerCitta(DataSnapshot customerData) {
+        return customerData.child("citta").getValue(String.class);
+    }
+    public String getCustomerEmail(DataSnapshot customerData) {
+        return customerData.child("email").getValue(String.class);
+    }
+    
+   
+    
+}

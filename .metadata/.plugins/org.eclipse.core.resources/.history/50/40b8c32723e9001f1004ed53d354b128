@@ -1,0 +1,36 @@
+package com.example.box_manager.viewModel;
+
+import java.util.concurrent.ExecutionException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
+
+import com.example.box_manager.model.Company;
+import com.example.box_manager.repository.CompanyRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Component
+public class HomepageViewModel {
+
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    public String getHomepageData(HttpServletRequest httpRequest, Model model) {
+        Company user = (Company) httpRequest.getSession().getAttribute("user");
+        if (user == null || user.getUid() == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            Company companyData = companyRepository.getCompanyDataByUserUid(user.getUid()).get();
+            model.addAttribute("aziendaNome", companyData.getNome());
+
+        } catch (InterruptedException | ExecutionException e) {
+            model.addAttribute("messaggioErrore", "Errore nel recupero dei dati.");
+        }
+
+        return "homepage";
+    }
+}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Clienti</title>
+    <link rel="stylesheet" href="../css/customerdetail.css">
+
+</head>
+<body>
+    <div class="top-bar">
+        <span class="company-name" th:text="${aziendaNome}">Nome Azienda</span>
+        <a href="/homepage" class="homepage-btn">Homepage</a>
+    </div>
+
+    <div class="main-container">
+		
+		
+    </div>
+
+    <script src="js/customerdetail.js"></script>
+</body>
+</html>

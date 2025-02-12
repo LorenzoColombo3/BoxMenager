@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Clienti</title>
+    <link rel="stylesheet" href="../css/customerdetail.css">
+
+</head>
+<body>
+    <div class="top-bar">
+        <span class="company-name" th:text="${aziendaNome}">Nome Azienda</span>
+        <a href="/homepage" class="homepage-btn">Homepage</a>
+    </div>
+
+    <div class="main-container">
+		<h2>Dettagli Cliente</h2>
+
+        <!-- Dettagli cliente -->
+        <div class="customer-info">
+            <p><strong>Nome:</strong> <span th:text="${cliente.nome}"></span></p>
+            <p><strong>Cognome:</strong> <span th:text="${cliente.cognome}"></span></p>
+            <p><strong>Città:</strong> <span th:text="${cliente.citta}"></span></p>
+            <p><strong>Email:</strong> <span th:text="${cliente.email}"></span></p>
+        </div>
+
+        <h3>Box Occupati</h3>
+        <!-- Lista dei box occupati -->
+        <div class="boxes-list">
+            <div class="box-card" th:each="box : ${boxOccupati}">
+                <p><strong>Box ID:</strong> <span th:text="${box.id}"></span></p>
+                <button th:attr="data-id=${box.id}" onclick="removeBox(this)">Rimuovi Box</button>
+            </div>
+        </div>
+
+        <h3>Assegna un Box</h3>
+        <form action="/customer/{{cliente.id}}/assignBox" method="POST">
+            <label for="boxId">Box ID:</label>
+            <input type="text" id="boxId" name="boxId" required>
+            <button type="submit">Assegna Box</button>
+        </form>
+
+        <form th:action="@{/customer/{id}/delete(id=${cliente.id})}" method="POST">
+            <button type="submit" class="delete-btn">Cancella Cliente</button>
+        </form>		
+    </div>
+
+    <script src="../js/customerdetail.js"></script>
+</body>
+</html>

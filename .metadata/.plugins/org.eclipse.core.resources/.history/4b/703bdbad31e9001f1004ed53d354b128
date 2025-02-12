@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Clienti</title>
+    <link rel="stylesheet" href="../css/customerdetail.css">
+
+</head>
+<body>
+    <div class="top-bar">
+        <span class="company-name" th:text="${aziendaNome}">Nome Azienda</span>
+        <a href="/homepage" class="homepage-btn">Homepage</a>
+    </div>
+
+   <div class="main-container">
+	    <h2>Dettagli Cliente</h2>
+	
+	    <!-- Dettagli cliente -->
+	    <div class="customer-info">
+	        <p class="customer-text"><strong>Nome:</strong> <span th:text="${cliente.nome}"></span></p>
+	        <p class="customer-text"><strong>Cognome:</strong> <span th:text="${cliente.cognome}"></span></p>
+	        <p class="customer-text"><strong>Città:</strong> <span th:text="${cliente.citta}"></span></p>
+	        <p class="customer-text"><strong>Email:</strong> <span th:text="${cliente.email}"></span></p>
+	    </div>
+	
+	    <h3>Box Occupati</h3>
+	    
+	    <!-- Card con scorrimento per i box occupati -->
+	    <div class="boxes-container">
+	        <div class="box-card" th:each="box : ${boxOccupati}">
+	            <p><strong>Box ID:</strong> <span th:text="${box.numero}"></span></p>
+	            <button th:attr="data-id=${box.numero}" onclick="removeBox(this)">Rimuovi Box</button>
+	        </div>
+	    </div>
+	
+	    <!-- Pulsanti posizionati in basso -->
+		<div class="button-container">    
+	        <button class="add-box-btn" onclick="showAddBoxForm()">Assegna Box</button>
+		    
+		  
+		</div>
+
+	</div>
+	
+	<div id="overlay" style="display: none;"></div>
+	<div id="addBoxForm" style="display: none;">
+	    <h3>Aggiungi Box</h3>
+	    <form th:action="@{/assigUnit}" method="post">
+		    <label for="numero">Numero Box:</label>
+		    <select id="numero" name="numero" required>
+		        <option value="" disabled selected>Seleziona un box libero</option>
+		        <th:block th:each="box : ${availableBoxes}">
+		            <option th:value="${box.numero}" th:text="${box.numero}"></option>
+		        </th:block>
+		    </select><br>
+		
+		    <label for="dataInizio">Data Inizio:</label>
+		    <input type="date" id="dataInizio" name="dataInizio" required><br>
+		
+		    <label for="dataFine">Data Fine:</label>
+		    <input type="date" id="dataFine" name="dataFine" required><br>
+		
+		    <label for="codice">Codice Sblocco:</label>
+		    <input type="text" id="codice" name="codice" required><br>
+		    
+		    <button type="submit">Salva</button>
+		    <button type="button" onclick="hideAddBoxForm()">Annulla</button>
+		        
+			<input type="hidden" id="customerId" name="customerId" th:value="${cliente.id}" />
+
+		</form>
+	</div>
+
+    <script src="../js/customerdetail.js"></script>
+</body>
+</html>

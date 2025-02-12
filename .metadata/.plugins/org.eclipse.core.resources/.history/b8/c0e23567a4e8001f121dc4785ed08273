@@ -1,0 +1,18 @@
+package com.example.box_manager.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import com.example.box_manager.viewModel.BoxPageViewModel;
+
+@Controller
+public class BoxController {
+	
+	BoxPageViewModel boxPageViewModel;
+	
+	@Autowired
+	BoxController(BoxPageViewModel boxPageViewModel){
+		this.boxPageViewModel = boxPageViewModel;
+	}
+	
+
+}

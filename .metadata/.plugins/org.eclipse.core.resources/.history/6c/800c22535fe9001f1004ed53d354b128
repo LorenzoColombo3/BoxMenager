@@ -1,0 +1,40 @@
+// Funzione che gestisce il click sui pulsanti e invia una richiesta GET al server
+function goToPage(page) {
+    let url = '';
+    switch (page) {
+        case 'sites':
+            url = '/boxes';
+            break;
+        case 'customers':
+            url = '/customers';
+            break;
+        case 'profile':
+            url = '/profile';
+            break;
+        default:
+            console.error('Endpoint sconosciuto');
+            return;
+    }
+
+    // Invia la richiesta GET al server
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text(); // Puoi anche usare response.json() se ti aspetti una risposta JSON
+        }
+        throw new Error('Errore nella richiesta');
+    })
+    .then(data => {
+        // Puoi fare qualcosa con la risposta, ad esempio reindirizzare
+        console.log(data);
+        window.location.href = url; // Reindirizza alla pagina dopo la risposta positiva
+    })
+    .catch(error => {
+        console.error('Errore nella richiesta:', error);
+    });
+}

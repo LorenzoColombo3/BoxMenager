@@ -1,0 +1,51 @@
+package com.example.box_manager.viewModel;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.example.box_manager.model.Company;
+import com.example.box_manager.model.Unit;
+import com.example.box_manager.repository.CompanyRepository;
+import com.example.box_manager.repository.UnitRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+@Component
+public class BoxPageViewModel {
+
+	@Autowired
+    private final UnitRepository unitRepository;
+    @Autowired
+    private CompanyRepository compRep;
+
+    @Autowired
+    public BoxPageViewModel(HttpServletRequest httpRequest,UnitRepository unitRepository) {
+    	Company user = (Company) httpRequest.getSession().getAttribute("user");
+    	if (user == null || user.getUid() == null) {
+            return "redirect:/login"; 
+        }else {
+        	Company updatedUser = compRep.getCompanyDataByUserUid(user.getUid()).get();
+            
+            System.out.println("Utente aggiornato: " + updatedUser);
+
+            httpRequest.getSession().setAttribute("user", updatedUser);
+            
+            System.out.println(updatedUser.getCliente().toString());
+            
+            // Verifica che l'utente sia stato correttamente aggiornato nella sessione
+            System.out.println("Utente nella sessione dopo l'aggiornamento: " + httpRequest.getSession().getAttribute("user"));
+        }
+        this.unitRepository = unitRepository;
+    }
+
+    public CompletableFuture<List<Unit>> getAllBoxes(String uid) {
+        return unitRepository.getDepositoUnits(uid);
+    }
+
+	public void addNewBox(String uid, Unit newUnit) {
+		unitRepository.addNewBox(uid, newUnit);
+	}
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Clienti</title>
+    <link rel="stylesheet" href="css/customerpage.css">
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <span class="company-name" th:text="${aziendaNome}">Nome Azienda</span>
+        <a href="/homepage" class="homepage-btn">Homepage</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <h2>Gestione Clienti</h2>
+
+        <div class="customer-list">
+		    <div class="customer-card" th:each="cliente : ${clienti}">
+		        <div class="customer-info">
+		            <p><strong>Nome:</strong> <span th:text="${cliente.nome}"></span></p>
+		            <p><strong>Cogome:</strong> <span th:text="${cliente.cognome}"></span></p>
+		            <p><strong>Città:</strong> <span th:text="${cliente.citta}"></span></p>
+		            <p><strong>Email:</strong> <span th:text="${cliente.email}"></span></p>
+		        </div>
+		    </div>
+		</div>
+        <button class="add-customer-btn" onclick="showAddCustomerForm()">+ Aggiungi cliente</button>
+        <div id="overlay" style="display: none;"></div>
+        
+        <!-- Form Aggiungi Cliente -->
+		<div id="addCustomerForm" style="display: none;">
+		    <h3>Aggiungi Cliente</h3>
+		    <form action="/customers/add" method="POST">
+		        <label for="nome">Nome:</label>
+		        <input type="text" id="nome" name="nome" required><br>
+		
+		        <label for="cognome">Cognome:</label>
+		        <input type="text" id="cognome" name="cognome" required><br>
+		
+		        <label for="citta">Città:</label>
+		        <input type="text" id="citta" name="citta" required><br>
+		
+		        <label for="email">Email:</label>
+		        <input type="email" id="email" name="email" required><br>
+		
+		        <button type="submit">Salva</button>
+		        <button type="button" onclick="hideAddCustomerForm()">Annulla</button>
+		    </form>
+		</div>
+
+
+    </div>
+
+    <script src="js/customerpage.js"></script>
+</body>
+</html>

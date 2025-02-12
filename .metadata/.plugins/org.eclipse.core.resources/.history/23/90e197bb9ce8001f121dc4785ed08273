@@ -1,0 +1,201 @@
+/* Reset e base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+}
+
+/* Top bar */
+.top-bar {
+    background-color: #007BFF; /* Colore blu */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    position: relative; /* Necessario per posizionare elementi assoluti */
+    font-size: 18px;
+}
+
+
+.company-name {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+
+.homepage-btn {
+    background-color: white;
+    color: #007BFF;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.homepage-btn:hover {
+    background-color: #0056b3; /* Colore blu più scuro */
+    color: white;
+}
+
+/* Main Container */
+.main-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Title */
+h2 {
+    font-size: 2rem;
+    color: #007BFF;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Customer List */
+.customer-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Customer Card */
+.customer-card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.customer-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background-color: lightskyblue;
+}
+
+/* Customer Info */
+.customer-info p {
+    margin: 8px 0;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Customer Actions */
+.customer-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.delete-btn, .assign-box-btn {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+
+.delete-btn:hover,#addCustomerForm button[type="button"]:hover{
+    background-color: #d9534f; /* Rosso */
+}
+
+.assign-box-btn:hover, .add-customer-btn:hover,#addCustomerForm button[type="submit"]:hover{
+    background-color: #5cb85c; /* Verde */
+}
+.add-customer-btn {
+    position: fixed;
+    bottom: 20px; /* Distanza dal basso */
+    right: 20px; /* Distanza dalla destra */
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    z-index: 1000; /* Assicura che sia sopra gli altri elementi */
+}
+
+/* Posiziona il form al centro della pagina */
+#addCustomerForm {
+    position: fixed;    /* Posiziona il form sopra gli altri elementi */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff !important;  /* Sfondo bianco */
+    padding: 20px;
+    border-radius: 15px;  /* Angoli arrotondati */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombra per sollevarlo */
+    z-index: 100;  /* Garantire che il form stia sopra a tutti gli altri elementi */
+    width: 80%;  /* Larghezza del form */
+    max-width: 800px;  /* Limita la larghezza massima */
+    box-sizing: border-box; /* Include il padding nel calcolo della larghezza */
+}
+/* Overlay che copre tutta la pagina */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);  /* Un overlay grigio trasparente */
+    z-index: 80;  /* Posizionarlo sotto il form */
+}
+
+
+/* Stile per il contenitore del form che viene messo sopra l'overlay */
+#addCustomerForm > div {
+    z-index: 10000;  /* Garantire che il contenuto del form stia sopra l'overlay */
+}
+
+/* Stili per i campi del form */
+#addCustomerForm input,
+#addCustomerForm select,
+#addCustomerForm textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* Bottoni */
+#addCustomerForm button {
+    width: 48%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#addCustomerForm button[type="submit"] {
+    background-color: #007BFF;
+    color: white;
+}
+
+#addCustomerForm button[type="button"] {
+    background-color: #ccc;
+}

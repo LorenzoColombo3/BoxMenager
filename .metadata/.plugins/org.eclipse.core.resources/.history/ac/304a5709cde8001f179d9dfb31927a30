@@ -1,0 +1,29 @@
+function showAddBoxForm() {
+    document.getElementById("addBoxForm").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+    // Invia la richiesta GET al server
+    fetch('/available', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text(); 
+        }
+        throw new Error('Errore nella richiesta');
+    })
+    .then(data => {
+        
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Errore nella richiesta:', error);
+    });
+}
+
+function hideAddBoxForm() {
+    document.getElementById("addBoxForm").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+}

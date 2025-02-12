@@ -1,0 +1,36 @@
+package com.example.box_manager.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.example.box_manager.viewModel.CustomersViewModel;
+import jakarta.servlet.http.HttpServletRequest;
+
+@Controller
+public class CustomersController {
+
+    private final CustomersViewModel customersViewModel;
+
+    @Autowired
+    public CustomersController(CustomersViewModel customersViewModel) {
+        this.customersViewModel = customersViewModel;
+    }
+
+    @GetMapping("/customers")
+    public String getCustomersPage(HttpServletRequest httpRequest, Model model) {
+        return customersViewModel.getCustomersPage(httpRequest, model);
+    }
+
+    @PostMapping("/customers/add")
+    public String addCustomer(@RequestParam String nome, 
+                              @RequestParam String cognome, 
+                              @RequestParam String citta, 
+                              @RequestParam String email,
+                              HttpServletRequest httpRequest) {
+        return customersViewModel.addCustomer(nome, cognome, citta, email, httpRequest);
+    }
+}

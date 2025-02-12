@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <link rel="stylesheet" href="css/homepage.css">
+    <script src="js/homepage.js" defer></script>
+</head>
+<body>
+    <div class="top-bar">
+        <span class="company-name" th:text="${aziendaNome}">Nome Azienda</span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="card">
+            <h2>Benvenuto!</h2>
+            <div class="button-container">
+                <button id="sites" onclick="goToPage('sites')">Gestisci i tuoi spazi</button>
+                <button id="customers" onclick="goToPage('customers')">Gestisci i tuoi Clienti</button>
+                <button id="profile" onclick="goToPage('profile')">Gestisci il tuo profilo</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

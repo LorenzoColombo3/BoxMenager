@@ -1,0 +1,78 @@
+package com.example.box_manager.viewModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
+
+import com.example.box_manager.model.Company;
+import com.example.box_manager.model.Customer;
+import com.example.box_manager.repository.CompanyRepository;
+import com.example.box_manager.repository.CustomerRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Component
+public class CustomersViewModel {
+
+    @Autowired
+    private CustomerRepository cr;
+    @Autowired
+    private CompanyRepository compRep;
+
+    public String getCustomersPage(HttpServletRequest httpRequest, Model model) {
+        Company user = (Company) httpRequest.getSession().getAttribute("user"); 
+        if (user == null || user.getUid() == null) {
+            return "redirect:/login"; 
+        }
+
+        model.addAttribute("aziendaNome", user.getNome());
+
+        List<Customer> customersList = getCustomerList(user);
+
+        model.addAttribute("clienti", customersList);
+
+        return "customerpage";
+    }
+
+    public String addCustomer(String nome, String cognome, String citta, String email, HttpServletRequest httpRequest) {
+        Company user = (Company) httpRequest.getSession().getAttribute("user");
+        if (user == null || user.getUid() == null) {
+            return "redirect:/login"; 
+        }
+
+        Customer newCustomer = new Customer();
+        newCustomer.setNome(nome);
+        newCustomer.setCognome(cognome);
+        newCustomer.setCitta(citta);
+        newCustomer.setEmail(email);
+
+        cr.addNewCustomer(user.getUid(), newCustomer);
+       
+        Company updatedUser=null;
+		try {
+			updatedUser = compRep.getCompanyDataByUserUid(user.getUid()).get();
+	        httpRequest.getSession().setAttribute("user", updatedUser);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+        return "redirect:/customers";
+    }
+
+    private List<Customer> getCustomerList(Company user) {
+        List<Customer> customersList = new ArrayList<>();
+        for (String id : user.getCliente()) {
+            try {
+                Customer customer = cr.getCustomersDataByUserUid(user.getUid(), id).get();
+                customersList.add(customer);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        return customersList;
+    }
+}

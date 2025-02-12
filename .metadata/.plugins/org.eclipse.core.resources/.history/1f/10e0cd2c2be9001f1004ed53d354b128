@@ -1,0 +1,77 @@
+function showAddBoxForm() {
+    document.getElementById("addBoxForm").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+    
+    // Invia la richiesta GET al server per ottenere i box disponibili
+    fetch('/available', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();  // La risposta è JSON, quindi facciamo il parsing
+        }
+        throw new Error('Errore nella richiesta');
+    })
+    .then(data => {
+        // Qui assumerò che `data` sia un array di oggetti che rappresentano i box
+        const selectElement = document.getElementById("numero");  // Trova il menu a tendina
+
+        // Pulisce le opzioni esistenti nel menu a tendina
+        selectElement.innerHTML = "<option value='' disabled selected>Seleziona un box libero</option>";
+
+        // Aggiungi un'opzione per ogni box disponibile
+        data.forEach(box => {
+            const option = document.createElement("option");
+            option.value = box.numero;  // Imposta il numero del box come valore dell'opzione
+            option.textContent = `${box.numero} - ${box.superficie.toFixed(2)} m²`;  // Mostra il numero del box e la superficie
+            selectElement.appendChild(option);  // Aggiungi l'opzione al menu a tendina
+        });
+    })
+    .catch(error => {
+        console.error('Errore nella richiesta:', error);
+    });
+}
+
+function submitBoxForm(event) {
+    event.preventDefault(); // Previene il submit classico
+
+    let formData = {
+        numero: document.getElementById("numero").value,
+        dataInizio: document.getElementById("dataInizio").value,
+        dataFine: document.getElementById("dataFine").value,
+        codice: document.getElementById("codice").value
+    };
+
+    fetch("/assigUnit", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Errore nell'assegnazione del box.");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Box assegnato:", data);
+        hideAddBoxForm(); // Nasconde il form dopo il successo
+        location.reload(); // Aggiorna la pagina per mostrare il nuovo box assegnato
+    })
+    .catch(error => {
+        console.error("Errore:", error);
+        alert("Errore nell'assegnazione del box.");
+    });
+}
+
+
+
+function hideAddBoxForm() {
+    document.getElementById("addBoxForm").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+}

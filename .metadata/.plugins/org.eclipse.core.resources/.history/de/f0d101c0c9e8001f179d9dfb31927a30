@@ -1,0 +1,199 @@
+/* Reset e base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    display: flex;
+    justify-content: center;  /* Centra orizzontalmente */
+    align-items: center;      /* Centra verticalmente */
+    min-height: 100vh;        /* Assicura che prenda tutta l'altezza */
+    padding: 20px;            /* Per evitare che tocchi i bordi */
+}
+
+/* Top bar */
+.top-bar {
+    background-color: #007BFF;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    font-size: 18px;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Nome azienda */
+.company-name {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Bottone homepage */
+.homepage-btn {
+    background-color: white;
+    color: #007BFF;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.homepage-btn:hover {
+    background-color: #0056b3;
+    color: white;
+}
+
+/* Main Container centrato */
+.main-container {
+    max-width: 800px;
+    width: 100%;
+    background-color: #e3f2fd;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+    justify-content: space-between;
+}
+
+/* Informazioni cliente */
+.customer-info {
+    margin-bottom: 20px;
+    margin-top: 10px; /* Aggiunto margine superiore */
+}
+
+
+/* Card contenente i box occupati */
+.boxes-container {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+}
+
+/* Singolo box */
+.box-card {
+    background-color: #ffffff;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Contenitore per i pulsanti in basso */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+}
+
+/* Pulsanti */
+button {
+    cursor: pointer;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.delete-btn {
+    background-color: red;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #d9534f;
+}
+
+.add-box-btn {
+    background-color: #007BFF;
+    color: #fff;
+}
+
+.add-box-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Posiziona il form al centro della pagina */
+#addCustomerForm {
+    position: fixed;    /* Posiziona il form sopra gli altri elementi */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff !important;  /* Sfondo bianco */
+    padding: 20px;
+    border-radius: 15px;  /* Angoli arrotondati */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombra per sollevarlo */
+    z-index: 100;  /* Garantire che il form stia sopra a tutti gli altri elementi */
+    width: 80%;  /* Larghezza del form */
+    max-width: 800px;  /* Limita la larghezza massima */
+    box-sizing: border-box; /* Include il padding nel calcolo della larghezza */
+}
+/* Overlay che copre tutta la pagina */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);  /* Un overlay grigio trasparente */
+    z-index: 80;  /* Posizionarlo sotto il form */
+}
+
+
+/* Stile per il contenitore del form che viene messo sopra l'overlay */
+#addCustomerForm > div {
+    z-index: 10000;  /* Garantire che il contenuto del form stia sopra l'overlay */
+}
+
+/* Stili per i campi del form */
+#addCustomerForm input,
+#addCustomerForm select,
+#addCustomerForm textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* Bottoni */
+#addCustomerForm button {
+    width: 48%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#addCustomerForm button[type="submit"] {
+    background-color: #007BFF;
+    color: white;
+}
+
+#addCustomerForm button[type="button"] {
+    background-color: #ccc;
+}

@@ -1,0 +1,24 @@
+1737964055101	Move compilation unit
+1737964061086	Delete element
+1737964072059	Rename type 'LoginController'
+1737964184765	Move compilation unit
+1737964206296	Rename type 'HomepageController'
+1737964210197	Delete element
+1737968308198	Rename type 'User'
+1737993326032	Delete element
+1737993329864	Delete element
+1737993794434	Rename resource 'profilepage'
+1737994043838	Rename type 'UserRepository'
+1737994481779	Encapsulate field 'indirizzo'
+1737994486248	Encapsulate field 'email'
+1737994497000	Encapsulate field 'telefono'
+1738055566369	Delete element
+1738055624072	Rename type 'Unit'
+1738069265784	Rename field 'cliente'
+1738069273813	Rename field 'deposito'
+1738070751157	Encapsulate field 'numero'
+1738080187119	Encapsulate field 'id'
+1738080362583	Encapsulate field 'numero'
+1738083538240	Delete element
+1738099226067	Rename resource 'cusotmerPage.html'
+1738099517322	Rename resource 'cusotmerpage.html'

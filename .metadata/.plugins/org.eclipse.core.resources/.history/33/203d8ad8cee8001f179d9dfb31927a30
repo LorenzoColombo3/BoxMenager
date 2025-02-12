@@ -1,0 +1,84 @@
+package com.example.box_manager.controller;
+
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.example.box_manager.model.Company;
+import com.example.box_manager.model.Customer;
+import com.example.box_manager.model.Unit;
+import com.example.box_manager.viewModel.CustomerDetailViewModel;
+import com.example.box_manager.viewModel.CustomersViewModel;
+import jakarta.servlet.http.HttpServletRequest;
+
+@Controller
+public class CustomersController {
+
+    private final CustomersViewModel customersViewModel;
+    private final CustomerDetailViewModel customerDetailViewModel;
+
+    @Autowired
+    public CustomersController(CustomersViewModel customersViewModel, CustomerDetailViewModel customerDetailViewModel) {
+        this.customersViewModel = customersViewModel;
+        this.customerDetailViewModel = customerDetailViewModel;
+    }
+
+    @GetMapping("/customers")
+    public String getCustomersPage(HttpServletRequest httpRequest, Model model) throws InterruptedException, ExecutionException {
+        return customersViewModel.getCustomersPage(httpRequest, model);
+    }
+
+    @PostMapping("/customers/add")
+    public String addCustomer(@RequestParam String nome, 
+                              @RequestParam String cognome, 
+                              @RequestParam String citta, 
+                              @RequestParam String email,
+                              HttpServletRequest httpRequest) {
+        return customersViewModel.addCustomer(nome, cognome, citta, email, httpRequest);
+    }
+    
+    @GetMapping("/customer/detail")
+    public String getCustomerDetail(@RequestParam String customerId, Model model,HttpServletRequest httpRequest) {
+        Company user = (Company) httpRequest.getSession().getAttribute("user");
+
+        if (user == null || user.getUid() == null) {
+            return "redirect:/login"; // Reindirizza al login se l'utente non è autenticato
+        }
+        
+        // Recupera i dettagli del cliente dal repository tramite il customerId
+		model = customerDetailViewModel.getCustomerDetail(user.getUid(), customerId,httpRequest,model);
+
+        return "customerdetailpage"; // Restituisce la pagina HTML del cliente
+    }
+    
+    @PostMapping("/customer/{customerId}/delete")
+    public String deleteCustomer(@PathVariable("customerId") String customerId,HttpServletRequest httpRequest) {
+        Company user = (Company) httpRequest.getSession().getAttribute("user");
+        user.removeCliente(customerId);
+        String page = customerDetailViewModel.deleteById(user.getUid(),customerId); 
+        return page;
+    }
+    
+    @GetMapping("/available")
+    @ResponseBody
+    public List<Unit> getAvailableBoxes(HttpServletRequest httpRequest, Model model) throws InterruptedException, ExecutionException {
+        Company user = (Company) httpRequest.getSession().getAttribute("user");
+
+        // Recupera i box disponibili
+        List<Unit> availableBoxes = customerDetailViewModel.getAvailableBoxes(user.getUid());
+        
+
+        return availableBoxes;  // Dopo la stampa, reindirizza alla homepage
+    }
+
+    
+}

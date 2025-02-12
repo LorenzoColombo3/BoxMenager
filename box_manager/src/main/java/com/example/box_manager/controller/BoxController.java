@@ -1,0 +1,67 @@
+package com.example.box_manager.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.example.box_manager.model.Company;
+import com.example.box_manager.model.Unit;
+import com.example.box_manager.viewModel.BoxPageViewModel;
+import com.example.box_manager.viewModel.CustomerDetailViewModel;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+@Controller
+public class BoxController {
+
+    private final BoxPageViewModel boxPageViewModel;
+    private final CustomerDetailViewModel customerDetailViewModel;
+
+    @Autowired
+    public BoxController(BoxPageViewModel boxPageViewModel, CustomerDetailViewModel customerDetailViewModel) {
+        this.boxPageViewModel = boxPageViewModel;
+        this.customerDetailViewModel = customerDetailViewModel;
+    }
+
+    @GetMapping("/boxes")
+    public String showBoxesPage(HttpServletRequest httpRequest, Model model) throws InterruptedException, ExecutionException {
+    	Company user = (Company) httpRequest.getSession().getAttribute("user");
+        if (user == null || user.getUid() == null) {
+            return "redirect:/login";
+        }
+        model = boxPageViewModel.getBoxPage(httpRequest,model);
+        return "boxpage";
+    }
+    
+    @PostMapping("/boxes/add")
+    public String addBox(@RequestParam("numero") String numero,
+                         @RequestParam("altezza") int altezza,
+                         @RequestParam("larghezza") int larghezza,
+                         @RequestParam("profondita") int profondita,
+                         @RequestParam("costo") int costo,
+                         @RequestParam("tipo") String tipo,
+                         HttpServletRequest httpRequest) {
+    	Company user = (Company) httpRequest.getSession().getAttribute("user");
+        Unit newUnit = new Unit(numero, altezza, larghezza, profondita, false, costo, tipo, -1);
+        
+        boxPageViewModel.addNewBox(user.getUid(), newUnit);
+
+        return "redirect:/boxes";
+    }
+    
+    @GetMapping("/available")
+    @ResponseBody
+    public List<Unit> getAvailableBoxes(HttpServletRequest httpRequest) throws InterruptedException, ExecutionException {
+    	Company user = (Company) httpRequest.getSession().getAttribute("user");
+        List<Unit> availableBoxes = customerDetailViewModel.getAvailableBoxes(user.getUid());
+        return availableBoxes;
+    }
+    
+}

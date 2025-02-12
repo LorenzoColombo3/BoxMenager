@@ -1,0 +1,89 @@
+package com.example.box_manager.viewModel;
+
+import com.example.box_manager.model.Company;
+import com.example.box_manager.repository.CompanyRepository;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+@Controller
+public class LoginViewModel {
+	
+	@Autowired
+	CompanyRepository cr;
+
+    // Gestisce la richiesta GET per la pagina di login
+    @GetMapping("/login")
+    public String showLoginPage(Model model) {
+        // Puoi anche aggiungere eventuali attributi al model se necessario
+        return "login"; // Restituisce il template della pagina di login
+    }
+    
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> request, HttpServletRequest httpRequest) {
+        String token = request.get("token");
+
+        try {
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+            String email = decodedToken.getEmail();
+            String id = decodedToken.getUid();
+
+            // Crea l'utente autenticato
+            Company user = authenticate(email, token, id);
+            if (user != null) {
+            	user= cr.getCompanyDataByUserUid(id).get();
+            	user.setUid(id);
+                System.out.println(user.getNome()+user.getUid());
+                httpRequest.getSession().setAttribute("user", user); // Salva l'utente nella sessione
+                return ResponseEntity.ok().body(Map.of("success", true));
+            } else {
+                return ResponseEntity.status(401).body(Map.of("success", false, "message", "Utente non trovato."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("success", false, "message", "Token invalido."));
+        }
+    }
+    
+    public Company authenticate(String email, String token, String id) {
+        try {
+            System.out.println("Autenticazione in corso per email: " + email);
+
+            // Simula la verifica e crea un oggetto User
+            Company user = new Company();
+            user.setUid(id);
+
+            // Salva l'utente nella sessione
+            saveUserInSession(user);
+
+            System.out.println("Autenticazione completata con successo per email: " + email);
+            return user;
+
+        } catch (Exception e) {
+            System.err.println("Errore durante l'autenticazione: " + e.getMessage());
+            return null;
+        }
+    }
+    
+    private void saveUserInSession(Company user) {
+        // Salva l'utente nella sessione HTTP
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            attributes.getRequest().getSession().setAttribute("user", user);
+        }
+    }
+    
+}

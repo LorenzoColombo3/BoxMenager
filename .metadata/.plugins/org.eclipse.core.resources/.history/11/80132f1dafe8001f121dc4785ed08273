@@ -1,0 +1,24 @@
+package com.example.box_manager.viewModel;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import com.example.box_manager.model.Unit;
+import com.example.box_manager.repository.UnitRepository;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+@Component
+public class BoxPageViewModel {
+
+    private final UnitRepository unitRepository;
+
+    @Autowired
+    public BoxPageViewModel(UnitRepository unitRepository) {
+        this.unitRepository = unitRepository;
+    }
+
+    public CompletableFuture<List<Unit>> getAllBoxes(String uid) {
+        return unitRepository.getDepositoUnits(uid);
+    }
+}

@@ -1,0 +1,36 @@
+package com.example.box_manager.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.example.box_manager.model.Company;
+import com.example.box_manager.viewModel.BoxPageViewModel;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.concurrent.ExecutionException;
+
+@Controller
+public class BoxController {
+
+    private final BoxPageViewModel boxPageViewModel;
+
+    @Autowired
+    public BoxController(BoxPageViewModel boxPageViewModel) {
+        this.boxPageViewModel = boxPageViewModel;
+    }
+
+    @GetMapping("/boxes")
+    public String showBoxesPage(HttpServletRequest httpRequest, Model model) {
+    	Company user = (Company) httpRequest.getSession().getAttribute("user");
+        try {
+            model.addAttribute("boxes", boxPageViewModel.getAllBoxes(user.getUid()).get());
+            return "boxpage";
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return "errorPage"; // Puoi creare una pagina di errore personalizzata
+        }
+    }
+}
